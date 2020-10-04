@@ -1,0 +1,15 @@
+save_entities.admin_form_1:
+  path: '/admin/config/content/save-nodes'
+  defaults:
+    _form: '\Drupal\save_entities\Form\SaveNodesForm'
+    _title: 'Save Nodes Helper'
+  requirements:
+    _permission: 'access node config page'
+
+save_entities.admin_form_2:
+  path: '/admin/config/content/save-media'
+  defaults:
+    _form: '\Drupal\save_entities\Form\SaveMediaForm'
+    _title: 'Save Media Helper'
+  requirements:
+    _permission: 'access media config page'

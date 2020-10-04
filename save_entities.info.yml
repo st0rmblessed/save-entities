@@ -1,0 +1,7 @@
+name: Save Entities
+description: "Provides a form to save nodes and media of certain types"
+type: module
+core: 8.x
+core_version_requirement: ^8 || ^9
+configure: save_entities.admin_form
+

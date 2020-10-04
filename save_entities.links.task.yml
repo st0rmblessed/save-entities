@@ -1,0 +1,9 @@
+save_entities.admin_form_1:
+  title: 'Save Nodes Settings'
+  base_route: 'entity.group.collection'
+  route_name: 'save_entities.admin_form_1'
+
+save_entities.admin_form_2:
+  title: 'Save Media Settings'
+  base_route: 'entity.group.collection'
+  route_name: 'save_entities.admin_form_2'

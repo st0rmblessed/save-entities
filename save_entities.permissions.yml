@@ -1,0 +1,7 @@
+'access node config page':
+  title: 'Access node configuration page'
+  description: 'Gives users permission to access the node configuration page'
+
+'access media config page':
+  title: 'Acess media configuration page'
+  description: 'Gives users permission to access the media configuration page.'

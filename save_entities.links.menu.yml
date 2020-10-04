@@ -1,0 +1,13 @@
+save_entities.admin_form_1:
+  route_name: save_entities.admin_form_1
+  title: 'Save Nodes Helper'
+  description: 'Enable automatic saving of all nodes from a certain content type'
+  parent: system.admin_config_content
+  weight: 10
+
+save_entities.admin_form_2:
+  route_name: save_entities.admin_form_2
+  title: 'Save Media Helper'
+  description: 'Enable automatic saving of all media from a certain type'
+  parent: system.admin_config_content
+  weight: 10

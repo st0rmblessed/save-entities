@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Save Entities module file.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function save_entities_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.save_entities':
+      $output = '';
+      $output .= '<h2>' . t('About') . '</h2>';
+      $output .= '<p>' . t('Save entities is a module that allow the users to save entities in bulk.')
+        . '</p>';
+      $output .= '<p>' . t('The module currently supports nodes and media. The user can define if only published nodes should be save or not.
+      Additionally, an option to update the changed time is provided')
+          . '</p>';
+      $output .= '<h2>' . t('Uses') . '</h2>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('Saving entities in bulk to trigger preprocess logic existing in other modules') . '</dt>';
+      $output .= '</dl>';
+      return $output;
+  }
+}
