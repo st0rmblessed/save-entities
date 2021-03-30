@@ -8,9 +8,10 @@ use Drupal\Core\State\StateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 
 /**
- * SaveNodesForm form.
+ * Extends FormBase with the SaveMedia options.
  */
 class SaveMediaForm extends FormBase {
 
@@ -36,6 +37,13 @@ class SaveMediaForm extends FormBase {
   protected $entityTypeManager;
 
   /**
+   * Provides an interface for an entity type bundle info.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
    * ReportWorkerBase constructor.
    *
    * @param \Drupal\Core\State\StateInterface $state
@@ -44,11 +52,14 @@ class SaveMediaForm extends FormBase {
    *   Provides an interface for an entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Provides an interface for entity type managers.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   Provides an interface for an entity type bundle info.
    */
-  public function __construct(StateInterface $state, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(StateInterface $state, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     $this->state = $state;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityTypeBundleInfo = $entity_type_bundle_info;
   }
 
   /**
@@ -58,7 +69,8 @@ class SaveMediaForm extends FormBase {
     return new static(
           $container->get('state'),
           $container->get('entity_field.manager'),
-          $container->get('entity_type.manager')
+          $container->get('entity_type.manager'),
+          $container->get('entity_type.bundle.info')
       );
   }
 
@@ -80,7 +92,7 @@ class SaveMediaForm extends FormBase {
       // Melhorar form para acomodar esta parte.
       $form['text'] = [
         '#type' => 'item',
-        '#description' => 'Oops! Looks like you dont have the media module enabled',
+        '#description' => $this->t('Oops! Looks like you dont have the media module enabled'),
       ];
     }
     else {
@@ -197,16 +209,16 @@ class SaveMediaForm extends FormBase {
 
         $batch = [
           'title' => $this->t('Saving media'),
-          'init_message' => t('Saving media process is starting.'),
+          'init_message' => $this->t('Saving media process is starting.'),
           'progress_message' => $this->t('Completed @current / @total batches. Estimated time: @estimate.'),
           'finished' => '\Drupal\save_entities\BatchProcess\SaveMediaBatchProcess::finishedCallback',
-          'error_message' => t('The batch process has encountered an error.'),
+          'error_message' => $this->t('The batch process has encountered an error.'),
           'operations' => $operations,
         ];
 
         batch_set($batch);
         $batch = &batch_get();
-        $batch[PROGRESSIVE] = FALSE;
+        $batch['PROGRESSIVE'] = FALSE;
 
       }
     }
@@ -229,11 +241,11 @@ class SaveMediaForm extends FormBase {
     // Get array of media ids.
     foreach ($media_types as $mediaType) {
       if ($only_published) {
-        $query = \Drupal::entityQuery('media')
+        $query = $this->entityTypeManager->getstorage('media')->getQuery()
           ->condition('bundle', $mediaType)->condition('status', '1');
       }
       else {
-        $query = \Drupal::entityQuery('media')
+        $query = $this->entityTypeManager->getstorage('media')->getQuery()
           ->condition('bundle', $mediaType);
       }
       array_push($media_ids, $query->execute());
@@ -252,9 +264,9 @@ class SaveMediaForm extends FormBase {
    */
   public function getMediaTypes() {
     $mediaTypesList = [];
-    $mediaTypes = \Drupal::service('entity_type.bundle.info')->getBundleInfo('media');
+    $mediaTypes = $this->entityTypeBundleInfo->getBundleInfo('media');
     foreach ($mediaTypes as $node_machine_name => $mediaType) {
-      $mediaTypesList[$node_machine_name] = $mediaType[label];
+      $mediaTypesList[$node_machine_name] = $mediaType['label'];
     }
     return $mediaTypesList;
   }

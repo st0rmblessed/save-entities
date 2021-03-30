@@ -8,9 +8,10 @@ use Drupal\Core\State\StateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 
 /**
- * SaveNodesForm form.
+ * Extends FormBase with the SaveNodes options.
  */
 class SaveNodesForm extends FormBase {
 
@@ -36,6 +37,13 @@ class SaveNodesForm extends FormBase {
   protected $entityTypeManager;
 
   /**
+   * Provides an interface for an entity type bundle info.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
    * ReportWorkerBase constructor.
    *
    * @param \Drupal\Core\State\StateInterface $state
@@ -44,11 +52,14 @@ class SaveNodesForm extends FormBase {
    *   Provides an interface for an entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Provides an interface for entity type managers.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   Provides an interface for an entity type bundle info.
    */
-  public function __construct(StateInterface $state, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(StateInterface $state, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     $this->state = $state;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityTypeBundleInfo = $entity_type_bundle_info;
   }
 
   /**
@@ -58,7 +69,8 @@ class SaveNodesForm extends FormBase {
     return new static(
           $container->get('state'),
           $container->get('entity_field.manager'),
-          $container->get('entity_type.manager')
+          $container->get('entity_type.manager'),
+          $container->get('entity_type.bundle.info')
       );
   }
 
@@ -191,16 +203,16 @@ class SaveNodesForm extends FormBase {
 
         $batch1 = [
           'title' => $this->t('Saving nodes'),
-          'init_message' => t('Saving nodes process is starting.'),
+          'init_message' => $this->t('Saving nodes process is starting.'),
           'progress_message' => $this->t('Completed @current / @total batches. Estimated time: @estimate.'),
           'finished' => '\Drupal\save_entities\BatchProcess\SaveNodesBatchProcess::finishedCallback',
-          'error_message' => t('The batch process has encountered an error.'),
+          'error_message' => $this->t('The batch process has encountered an error.'),
           'operations' => $operations,
         ];
 
         batch_set($batch1);
         $batch1 = &batch_get();
-        $batch1[PROGRESSIVE] = FALSE;
+        $batch1['PROGRESSIVE'] = FALSE;
 
       }
     }
@@ -224,11 +236,11 @@ class SaveNodesForm extends FormBase {
     // Get array of nodes ids.
     foreach ($content_types as $contentType) {
       if ($only_published) {
-        $query = \Drupal::entityQuery('node')
+        $query = $this->entityTypeManager->getstorage('node')->getQuery()
           ->condition('type', $contentType)->condition('status', '1');
       }
       else {
-        $query = \Drupal::entityQuery('node')
+        $query = $this->entityTypeManager->getstorage('node')->getQuery()
           ->condition('type', $contentType);
       }
       array_push($node_ids, $query->execute());
@@ -246,9 +258,9 @@ class SaveNodesForm extends FormBase {
    */
   public function getContentTypes() {
     $contentTypesList = [];
-    $contentTypes = \Drupal::service('entity_type.bundle.info')->getBundleInfo('node');
+    $contentTypes = $this->entityTypeBundleInfo->getBundleInfo('node');
     foreach ($contentTypes as $node_machine_name => $contentType) {
-      $contentTypesList[$node_machine_name] = $contentType[label];
+      $contentTypesList[$node_machine_name] = $contentType['label'];
     }
     return $contentTypesList;
   }

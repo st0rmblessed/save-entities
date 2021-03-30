@@ -36,7 +36,7 @@ class SaveMediaBatchProcess {
       for ($i = $start; $i < $max; $i++) {
         // Update our progress!
         $next = $ids_array[$i];
-        $context['sandbox']['curr_nid'] = (int) $next;
+        $context['sandbox']['curr_media'] = (int) $next;
         self::saveMedia($context['sandbox']['curr_media'], $save_date);
 
         // Add current media to results.

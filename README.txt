@@ -13,8 +13,8 @@ INTRODUCTION
 
 The Save Entities (save_entities) module provides a simple way for users to
 save nodes and media in bulk using a form. Besides the ability of choosing 
-which content types or media typesto save, the module also provides the option
-of saving only published content and to update thechanged date of the entities.
+which content types or media types to save, the module also provides the option
+of saving only published content and to update the changed date of the entities.
 
 REQUIREMENTS
 ------------
@@ -40,7 +40,7 @@ CONFIGURATION
 
    After choosing the form:
 
-   - Select which entitites should be save and which options should be checked;
+   - Select which entities should be saved and which options should be checked;
 
    - Click Save.
 
